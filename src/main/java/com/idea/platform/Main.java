@@ -5,6 +5,8 @@ public class Main {
 
 //        Object o = new JSONParser().parse(new FileReader(tickets.json));
 
+//        String ticketsJson = tickets.json;
+//        Ticket ticket = new Gson().fromJson(jsonInput, Ticket.class);
 
     }
 }
