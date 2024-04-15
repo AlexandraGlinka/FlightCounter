@@ -11,11 +11,11 @@ public class Ticket {
     String originName;
     String destination;
     String destinationName;
-    Date departureDate;
-    Time departureTime;
-    Date arrivalDate;
-    Time arrivalTime;
+    String departureDate;
+    String departureTime;
+    String arrivalDate;
+    String arrivalTime;
     String carrier;
-    Integer stops;
-    Integer price;
+    long stops;
+    long price;
 }

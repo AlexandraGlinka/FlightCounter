@@ -12,6 +12,11 @@ import java.util.Date;
 import java.util.List;
 
 public class JsonSimpleParserImpl implements JsonSimpleParse {
+
+    /**
+     * @return List<Ticket>
+     * метод для парсинга Json файла
+     */
     public List<Ticket> parse() {
         JSONParser parser = new JSONParser();
 
@@ -29,13 +34,13 @@ public class JsonSimpleParserImpl implements JsonSimpleParse {
                 ticket.setOriginName((String) ticketJson.get("origin_name"));
                 ticket.setDestination((String) ticketJson.get("destination"));
                 ticket.setDestinationName((String) ticketJson.get("destination_name"));
-                ticket.setDepartureDate((Date) ticketJson.get("departure_date"));
-                ticket.setDepartureTime((Time) ticketJson.get("departure_time"));
-                ticket.setArrivalDate((Date) ticketJson.get("arrival_date"));
-                ticket.setArrivalTime((Time) ticketJson.get("arrival_time"));
+                ticket.setDepartureDate((String) ticketJson.get("departure_date"));
+                ticket.setDepartureTime((String) ticketJson.get("departure_time"));
+                ticket.setArrivalDate((String) ticketJson.get("arrival_date"));
+                ticket.setArrivalTime((String) ticketJson.get("arrival_time"));
                 ticket.setCarrier((String) ticketJson.get("carrier"));
-                ticket.setStops((Integer) ticketJson.get("stops"));
-                ticket.setPrice((Integer) ticketJson.get("price"));
+                ticket.setStops((long) ticketJson.get("stops"));
+                ticket.setPrice((long) ticketJson.get("price"));
 
                 tickets.add(ticket);
             }
