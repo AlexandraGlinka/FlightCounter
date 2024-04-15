@@ -2,9 +2,6 @@ package com.idea.platform.Entity;
 
 import lombok.Data;
 
-import java.sql.Time;
-import java.util.Date;
-
 @Data
 public class Ticket {
     String origin;
@@ -15,7 +12,7 @@ public class Ticket {
     String departureTime;
     String arrivalDate;
     String arrivalTime;
-    String carrier;
+    String carrier; //авиаперевозчик
     long stops;
     long price;
 }
