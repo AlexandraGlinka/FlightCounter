@@ -7,6 +7,7 @@ import com.idea.platform.Service.TicketFilter;
 import com.idea.platform.Service.TicketFilterImpl;
 
 import java.util.List;
+import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
@@ -18,7 +19,12 @@ public class Main {
             System.out.println(ticket);
         }
 
-//        TicketFilter ticketFilter = new TicketFilterImpl();
-//        ticketFilter.calcMinTimeBtwVvoAndTlv(tickets).forEach(System.out::println);
+        System.out.println();
+
+        TicketFilter ticketFilter = new TicketFilterImpl();
+        Map<String, Long> carrierAndMinTime = ticketFilter.calcMinTimeBtwVvoAndTlv(tickets);
+        for (Map.Entry<String, Long> entry : carrierAndMinTime.entrySet()) {
+            System.out.println(entry);
+        }
     }
 }
