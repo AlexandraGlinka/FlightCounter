@@ -23,6 +23,7 @@ public class Main {
 
         TicketFilter ticketFilter = new TicketFilterImpl();
         Map<String, Long> carrierAndMinTime = ticketFilter.calcMinTimeBtwVvoAndTlv(tickets);
+        System.out.println("Минимальное время полета между городами Владивосток и Тель-Авив для каждого авиаперевозчика");
         for (Map.Entry<String, Long> entry : carrierAndMinTime.entrySet()) {
             System.out.println(entry);
         }
