@@ -9,6 +9,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 public class TicketFilterImpl implements TicketFilter {
     /**
@@ -19,9 +21,11 @@ public class TicketFilterImpl implements TicketFilter {
      */
     @Override
     public Map<String, Long> calcMinTimeBtwVvoAndTlv(List<Ticket> tickets) {
-        List<Ticket> ticketsBtwVvoAndTlv = chooseTicketsBtwVvoAndTlv(tickets); // все перевозки из Владивостока в Тель-Авив
-        Map<String, List<Ticket>> groupedByCarrier = groupTicketsByCarrier(ticketsBtwVvoAndTlv); // сгруппировали по направлениями
-        Map<String, Long> ticketsAndTime = new HashMap<>(); // мапа для направлений и минимального времени полета
+
+        List<Ticket> ticketsBtwVvoAndTlv = chooseTicketsBtwVvoAndTlv(tickets);
+        Map<String, List<Ticket>> groupedByCarrier = ticketsBtwVvoAndTlv.stream()
+                .collect(Collectors.groupingBy(ticket -> ticket.getCarrier()));
+        Map<String, Long> ticketsAndTime = new HashMap<>();
 
         for (String carrier : groupedByCarrier.keySet()) {
             List<Ticket> groupedTicket = groupedByCarrier.get(carrier);
@@ -34,56 +38,53 @@ public class TicketFilterImpl implements TicketFilter {
     }
 
     /**
-     *
      * @param tickets
-     * @return
+     * @return возвращает разницу между средней ценой  и медианой для полета между городами Владивосток и Тель-Авив
      */
     @Override
-    public Integer calcDiffBtwAverageAndMedianPriceBtwVvoAndTlv(List<Ticket> tickets) {
-        return null;
+    public long calcDiffBtwAverageAndMedianPriceBtwVvoAndTlv(List<Ticket> tickets) {
+
+        List<Ticket> ticketsBtwVvoAndTlv = chooseTicketsBtwVvoAndTlv(tickets);
+        List<Double> prices = ticketsBtwVvoAndTlv.stream()
+                .mapToDouble(Ticket::getPrice)
+                .sorted()
+                .boxed()
+                .collect(Collectors.toList());
+
+        OptionalDouble avgPrice = prices.stream()
+                .mapToDouble(Double::doubleValue)
+                .average();
+
+        OptionalDouble medianPrice;
+        int priceSize = prices.size();
+        if (priceSize % 2 == 1) {
+            medianPrice = DoubleStream.of(prices.get(priceSize / 2))
+                    .average();
+        } else {
+            medianPrice = DoubleStream.of(prices.get(priceSize / 2), prices.get(priceSize / 2 - 1))
+                    .average();
+        }
+
+        long diff = (long) avgPrice.getAsDouble() - (long) medianPrice.getAsDouble();
+
+        return diff;
     }
 
     /**
-     *
      * @param tickets список всех перелетов
      * @return List<Ticket>
      * возвращает список перелетов только из Владивостока в Тель-Авив
      */
     private List<Ticket> chooseTicketsBtwVvoAndTlv(List<Ticket> tickets) {
-        List<Ticket> ticketsBtwVvoAndTlv = new ArrayList<>();
-        for (Ticket ticket : tickets) {
-            if (ticket.getOriginName().equals("Владивосток") && ticket.getDestinationName().equals("Тель-Авив")) {
-                ticketsBtwVvoAndTlv.add(ticket);
-            }
-        }
+        List<Ticket> ticketsBtwVvoAndTlv = tickets.stream()
+                .filter(ticket -> ticket.getOriginName().equals("Владивосток") && ticket.getDestinationName().equals("Тель-Авив"))
+                .collect(Collectors.toList());
         return ticketsBtwVvoAndTlv;
     }
 
     /**
-     *
-     * @param tickets список перелетов только из Владивостока в Тель-Авив
-     * @return Map<String, List<Ticket>>
-     * возвращает мапу, где ключ - авиаперевозчик, значение - список перелетов у этого перевозчика
-     */
-    private Map<String, List<Ticket>> groupTicketsByCarrier(List<Ticket> tickets) {
-
-        Map<String, List<Ticket>> ticketsByCarrier = new HashMap<>();
-
-        for (Ticket ticket : tickets) {
-            String carrier = ticket.getCarrier();
-            if (!ticketsByCarrier.containsKey(carrier)) {
-                ticketsByCarrier.put(carrier, new ArrayList<>());
-            }
-            ticketsByCarrier.get(carrier).add(ticket);
-        }
-        return ticketsByCarrier;
-    }
-
-    /**
-     *
      * @param groupedTicket сгруппированный список перелетов у каждого перевозчика
-     * @return Long
-     * возвращает минимальное время перелета у каждого перевозчика
+     * @return Long возвращает минимальное время перелета у каждого перевозчика
      */
     private Long calculateMinFlightTime(List<Ticket> groupedTicket) {
         Long minFlightTime = Long.MAX_VALUE;
@@ -97,10 +98,8 @@ public class TicketFilterImpl implements TicketFilter {
     }
 
     /**
-     *
      * @param ticket перелет
-     * @return Long
-     * возвращает время перелета
+     * @return Long возвращает время перелета
      */
     private Long calculateFlightTime(Ticket ticket) {
 
